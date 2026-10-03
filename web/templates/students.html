@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Students | FaceAttend AI</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+
+    /* =====================================================
+       PAGE
+    ===================================================== */
+
+    .students-page {
+        max-width: 1250px;
+        margin: 0 auto;
+        padding: 30px 20px 50px;
+    }
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+
+    .students-hero {
+        position: relative;
+        overflow: hidden;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 25px;
+
+        padding: 28px 30px;
+        margin-bottom: 22px;
+
+        border-radius: 20px;
+
+        color: white;
+
+        background:
+            linear-gradient(
+                135deg,
+                #111827 0%,
+                #1e3a8a 55%,
+                #4338ca 100%
+            );
+
+        box-shadow:
+            0 18px 40px rgba(30, 64, 175, 0.20);
+    }
+
+    .students-hero::before {
+        content: "";
+
+        position: absolute;
+
+        width: 220px;
+        height: 220px;
+
+        right: -70px;
+        top: -100px;
+
+        border-radius: 50%;
+
+        background:
+            rgba(255, 255, 255, 0.08);
+    }
+
+    .students-hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-label {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 7px;
+
+        padding: 6px 11px;
+        margin-bottom: 10px;
+
+        border-radius: 999px;
+
+        background:
+            rgba(255, 255, 255, 0.10);
+
+        border:
+            1px solid rgba(255, 255, 255, 0.12);
+
+        color: #dbeafe;
+
+        font-size: 11px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+    }
+
+    .students-hero h1 {
+        margin: 0 0 7px;
+
+        color: white;
+
+        font-size: 30px;
+        line-height: 1.2;
+
+        letter-spacing: -0.7px;
+    }
+
+    .students-hero p {
+        margin: 0;
+
+        color: #cbd5e1;
+
+        font-size: 14px;
+    }
+
+    .hero-icon {
+        position: relative;
+        z-index: 2;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        min-width: 82px;
+        height: 82px;
+
+        border-radius: 22px;
+
+        background:
+            rgba(255, 255, 255, 0.10);
+
+        border:
+            1px solid rgba(255, 255, 255, 0.13);
+
+        font-size: 38px;
+    }
+
+    /* =====================================================
+       TOP ACTIONS
+    ===================================================== */
+
+    .top-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 15px;
+
+        margin-bottom: 18px;
+    }
+
+    .student-count {
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .student-count strong {
+        color: #111827;
+        font-size: 17px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    /* =====================================================
+       BUTTONS
+    ===================================================== */
+
+    .student-btn {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        min-height: 40px;
+
+        padding: 9px 15px;
+
+        border-radius: 9px;
+
+        border: none;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        font-size: 13px;
+        font-weight: 700;
+
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .student-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .student-btn-primary {
+        background: #2563eb;
+        color: white;
+
+        box-shadow:
+            0 5px 12px rgba(37, 99, 235, 0.20);
+    }
+
+    .student-btn-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .student-btn-secondary {
+        background: #f1f5f9;
+        color: #334155;
+
+        border: 1px solid #e2e8f0;
+    }
+
+    .student-btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .student-btn-danger {
+        background: #fff1f2;
+        color: #be123c;
+
+        border: 1px solid #fecdd3;
+    }
+
+    .student-btn-danger:hover {
+        background: #ffe4e6;
+    }
+
+    /* =====================================================
+       TABLE CARD
+    ===================================================== */
+
+    .students-card {
+        background: white;
+
+        border:
+            1px solid #e5e7eb;
+
+        border-radius: 18px;
+
+        padding: 0;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 8px 28px rgba(15, 23, 42, 0.07);
+    }
+
+    .table-header {
+        display: flex;
+
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 15px;
+
+        padding: 20px 22px;
+
+        border-bottom:
+            1px solid #e5e7eb;
+    }
+
+    .table-header h2 {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 18px;
+    }
+
+    .table-header p {
+        margin: 4px 0 0;
+
+        color: #64748b;
+
+        font-size: 12px;
+    }
+
+    .table-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        padding: 6px 10px;
+
+        border-radius: 999px;
+
+        background: #eff6ff;
+
+        color: #1d4ed8;
+
+        font-size: 12px;
+
+        font-weight: 700;
+    }
+
+    /* =====================================================
+       TABLE
+    ===================================================== */
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .students-table {
+        width: 100%;
+
+        border-collapse: collapse;
+
+        min-width: 760px;
+    }
+
+    .students-table th,
+    .students-table td {
+        padding: 15px 20px;
+
+        text-align: left;
+
+        border-bottom:
+            1px solid #eef2f7;
+    }
+
+    .students-table th {
+        background: #f8fafc;
+
+        color: #64748b;
+
+        font-size: 11px;
+
+        font-weight: 800;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.6px;
+    }
+
+    .students-table td {
+        color: #475569;
+
+        font-size: 14px;
+    }
+
+    .students-table tbody tr {
+        transition:
+            background 0.15s ease;
+    }
+
+    .students-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .students-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* =====================================================
+       NUMBER
+    ===================================================== */
+
+    .row-number {
+        width: 45px;
+
+        color: #94a3b8;
+
+        font-size: 12px;
+
+        font-weight: 700;
+    }
+
+    /* =====================================================
+       STUDENT ID
+    ===================================================== */
+
+    .student-id-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .student-avatar {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        width: 34px;
+        height: 34px;
+
+        flex-shrink: 0;
+
+        border-radius: 10px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #dbeafe,
+                #e0e7ff
+            );
+
+        color: #3730a3;
+
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .student-id {
+        color: #1d4ed8;
+
+        font-weight: 800;
+
+        font-size: 13px;
+    }
+
+    /* =====================================================
+       NAME
+    ===================================================== */
+
+    .student-name {
+        color: #111827;
+
+        font-weight: 700;
+    }
+
+    /* =====================================================
+       DATE
+    ===================================================== */
+
+    .registered-date {
+        color: #64748b;
+
+        font-size: 13px;
+    }
+
+    /* =====================================================
+       ACTIONS
+    ===================================================== */
+
+    .actions {
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        flex-wrap: wrap;
+    }
+
+    /* =====================================================
+       EMPTY STATE
+    ===================================================== */
+
+    .empty-state {
+        text-align: center;
+
+        padding: 70px 25px;
+
+        color: #64748b;
+    }
+
+    .empty-icon {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        width: 72px;
+        height: 72px;
+
+        margin: 0 auto 18px;
+
+        border-radius: 20px;
+
+        background: #eff6ff;
+
+        font-size: 32px;
+    }
+
+    .empty-state h2 {
+        margin: 0 0 8px;
+
+        color: #172033;
+
+        font-size: 21px;
+    }
+
+    .empty-state p {
+        max-width: 480px;
+
+        margin: 0 auto 20px;
+
+        color: #64748b;
+
+        font-size: 14px;
+    }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 800px) {
+
+        .students-hero {
+            padding: 24px;
+
+        }
+
+        .students-hero h1 {
+            font-size: 26px;
+        }
+
+        .hero-icon {
+            min-width: 70px;
+            height: 70px;
+            font-size: 30px;
+        }
+
+        .top-actions {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .students-page {
+            padding:
+                20px 12px 40px;
+        }
+
+        .students-hero {
+            padding: 22px;
+
+        }
+
+        .hero-icon {
+            display: none;
+        }
+
+        .students-hero h1 {
+            font-size: 24px;
+        }
+
+        .students-hero p {
+            font-size: 13px;
+        }
+
+        .header-actions {
+            width: 100%;
+        }
+
+        .header-actions .student-btn {
+            flex: 1;
+        }
+
+        .table-header {
+            padding: 17px;
+        }
+
+    }
+
+    @media (max-width: 450px) {
+
+        .header-actions {
+            flex-direction: column;
+        }
+
+        .header-actions .student-btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+
+</head>
+
+<body>
+
+<div class="students-page">
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="students-hero">
+
+    <div class="students-hero-content">
+
+        <div class="hero-label">
+            👥 Student Management
+        </div>
+
+        <h1>
+            Registered Students
+        </h1>
+
+        <p>
+            Manage students and view their attendance
+            information in FaceAttend AI.
+        </p>
+
+    </div>
+
+    <div class="hero-icon">
+        👥
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ACTION BAR
+===================================================== -->
+
+<div class="top-actions">
+
+    <div class="student-count">
+
+        {% if students %}
+
+            <strong>
+                {{ students|length }}
+            </strong>
+            registered
+            {{ "student" if students|length == 1 else "students" }}
+
+        {% else %}
+
+            <strong>0</strong>
+            registered students
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="student-btn student-btn-secondary"
+        >
+            ← Dashboard
+        </a>
+
+        <a
+            href="{{ url_for('register') }}"
+            class="student-btn student-btn-primary"
+        >
+            + Register Student
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     STUDENTS CARD
+===================================================== -->
+
+<div class="students-card">
+
+
+    {% if students %}
+
+
+        <div class="table-header">
+
+            <div>
+
+                <h2>
+                    Student Directory
+                </h2>
+
+                <p>
+                    All students registered in the system
+                </p>
+
+            </div>
+
+
+            <span class="table-badge">
+                ● {{ students|length }} Active
+            </span>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table class="students-table">
+
+                <thead>
+
+                <tr>
+
+                    <th>#</th>
+
+                    <th>
+                        Student
+                    </th>
+
+                    <th>
+                        Name
+                    </th>
+
+                    <th>
+                        Registered On
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for student in students %}
+
+                <tr>
+
+
+                    <td class="row-number">
+                        {{ loop.index }}
+                    </td>
+
+
+                    <td>
+
+                        <div class="student-id-wrapper">
+
+                            <div class="student-avatar">
+
+                                {{ student[2][0]|upper }}
+
+                            </div>
+
+                            <span class="student-id">
+
+                                {{ student[1] }}
+
+                            </span>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="student-name">
+
+                            {{ student[2] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="registered-date">
+
+                            {{ student[3] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="actions">
+
+                            <a
+                                href="{{ url_for(
+                                    'student_detail',
+                                    student_id=student[1]
+                                ) }}"
+                                class="student-btn student-btn-secondary"
+                            >
+                                View Details
+                            </a>
+
+
+                            <button
+                                type="button"
+                                class="student-btn student-btn-danger"
+                                onclick="deleteStudent(
+                                    '{{ student[1]|e }}',
+                                    '{{ student[2]|e }}'
+                                )"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- =================================================
+             EMPTY STATE
+        ================================================== -->
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                👤
+            </div>
+
+            <h2>
+                No Students Registered
+            </h2>
+
+            <p>
+                Register your first student to start
+                using facial recognition attendance.
+            </p>
+
+            <a
+                href="{{ url_for('register') }}"
+                class="student-btn student-btn-primary"
+            >
+                + Register First Student
+            </a>
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   DELETE STUDENT
+========================================================= */
+
+async function deleteStudent(
+    studentId,
+    studentName
+) {
+
+    const confirmed = confirm(
+
+        "Are you sure you want to delete " +
+        studentName +
+        " (" +
+        studentId +
+        ")?\n\n" +
+
+        "This will permanently delete:\n" +
+        "- Student record\n" +
+        "- Attendance records\n" +
+        "- Face recognition samples"
+
+    );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+
+            "/students/delete/" +
+            encodeURIComponent(studentId),
+
+            {
+                method: "POST"
+            }
+
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (data.success) {
+
+            alert(
+                "Student deleted successfully."
+            );
+
+            window.location.reload();
+
+        } else {
+
+            alert(
+                data.message ||
+                "Failed to delete student."
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Delete error:",
+            error
+        );
+
+        alert(
+            "Could not connect to the server."
+        );
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

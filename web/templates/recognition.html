@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Recognition | FaceAttend AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="container">
+
+        <h2>FaceAttend AI</h2>
+
+        <div>
+            <a href="/">Dashboard</a>
+            <a href="/students">Students</a>
+            <a href="/register">Register</a>
+        </div>
+
+    </div>
+
+</nav>
+
+
+<main class="container page">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Face Recognition</h1>
+
+            <p>
+                Look at the camera and blink once.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2 id="sessionStatus">
+            Checking attendance session...
+        </h2>
+
+        <p id="livenessStatus">
+            Waiting for camera...
+        </p>
+
+        <p id="recognitionStatus">
+            Recognition not started.
+        </p>
+
+    </div>
+
+
+    <div class="camera-container">
+
+        <video
+            id="video"
+            autoplay
+            playsinline
+            muted
+        ></video>
+
+        <canvas
+            id="canvas"
+            style="display:none;"
+        ></canvas>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Recognition Result</h2>
+
+        <div id="result">
+            No recognition result yet.
+        </div>
+
+    </div>
+
+
+    <button
+        id="backButton"
+        class="btn btn-primary"
+        onclick="window.location.href='/'"
+    >
+        Back to Dashboard
+    </button>
+
+</main>
+
+
+<script>
+
+const video =
+    document.getElementById("video");
+
+const canvas =
+    document.getElementById("canvas");
+
+const sessionStatus =
+    document.getElementById("sessionStatus");
+
+const livenessStatus =
+    document.getElementById("livenessStatus");
+
+const recognitionStatus =
+    document.getElementById("recognitionStatus");
+
+const result =
+    document.getElementById("result");
+
+
+let stream = null;
+
+let sessionActive = false;
+
+let livenessDetected = false;
+
+let livenessInProgress = false;
+
+let recognitionInProgress = false;
+
+
+// =========================================================
+// ESCAPE HTML
+// =========================================================
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        String(value ?? "");
+
+    return div.innerHTML;
+
+}
+
+
+// =========================================================
+// CAPTURE FRAME
+// =========================================================
+
+function captureFrame() {
+
+    if (
+        !video.videoWidth ||
+        !video.videoHeight
+    ) {
+        return null;
+    }
+
+    canvas.width =
+        video.videoWidth;
+
+    canvas.height =
+        video.videoHeight;
+
+    const context =
+        canvas.getContext("2d");
+
+    context.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    return canvas.toDataURL(
+        "image/jpeg",
+        0.85
+    );
+
+}
+
+
+// =========================================================
+// START CAMERA
+// =========================================================
+
+async function startCamera() {
+
+    try {
+
+        stream =
+            await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "user",
+                    width: {
+                        ideal: 640
+                    },
+                    height: {
+                        ideal: 480
+                    }
+                },
+                audio: false
+            });
+
+        video.srcObject =
+            stream;
+
+        await video.play();
+
+        livenessStatus.textContent =
+            "Camera ready. Please blink once.";
+
+        startLivenessChecking();
+
+    } catch (error) {
+
+        console.error(
+            "Camera error:",
+            error
+        );
+
+        livenessStatus.textContent =
+            "Could not access camera.";
+
+    }
+
+}
+
+
+// =========================================================
+// STOP CAMERA
+// =========================================================
+
+function stopCamera() {
+
+    if (stream) {
+
+        stream.getTracks().forEach(
+            track => track.stop()
+        );
+
+        stream = null;
+
+    }
+
+    video.srcObject = null;
+
+}
+
+
+// =========================================================
+// RESET LIVENESS
+// =========================================================
+
+async function resetLiveness() {
+
+    try {
+
+        await fetch(
+            "/api/liveness/reset",
+            {
+                method: "POST"
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Liveness reset error:",
+            error
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// LIVENESS CHECK
+// =========================================================
+
+async function checkLiveness() {
+
+    if (
+        livenessInProgress ||
+        !sessionActive ||
+        !stream ||
+        livenessDetected
+    ) {
+        return;
+    }
+
+    const image =
+        captureFrame();
+
+    if (!image) {
+        return;
+    }
+
+    livenessInProgress = true;
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/liveness/check",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        image: image
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (data.live) {
+
+            livenessDetected = true;
+
+            livenessStatus.textContent =
+                "✓ Liveness detected.";
+
+            recognitionStatus.textContent =
+                "Recognizing face...";
+
+            startRecognition();
+
+        } else {
+
+            livenessStatus.textContent =
+                "Please blink once.";
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Liveness error:",
+            error
+        );
+
+    } finally {
+
+        livenessInProgress = false;
+
+    }
+
+}
+
+
+// =========================================================
+// START LIVENESS
+// =========================================================
+
+async function startLivenessChecking() {
+
+    livenessDetected = false;
+
+    await resetLiveness();
+
+    livenessStatus.textContent =
+        "Please blink once.";
+
+}
+
+
+// =========================================================
+// RECOGNITION
+// =========================================================
+
+async function recognize() {
+
+    if (
+        recognitionInProgress ||
+        !sessionActive ||
+        !livenessDetected
+    ) {
+        return;
+    }
+
+    const image =
+        captureFrame();
+
+    if (!image) {
+        return;
+    }
+
+    recognitionInProgress = true;
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/recognize",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        image: image
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (data.recognized) {
+
+            result.innerHTML = `
+                <strong>
+                    ${escapeHtml(data.name)}
+                </strong>
+                <br>
+                Student ID:
+                ${escapeHtml(data.student_id)}
+                <br>
+                Confidence:
+                ${escapeHtml(data.confidence)}%
+                <br>
+                Attendance:
+                ${escapeHtml(data.attendance)}
+            `;
+
+            recognitionStatus.textContent =
+                data.attendance;
+
+            /*
+             * If attendance was newly marked,
+             * require a new blink for another person.
+             */
+            if (
+                data.attendance_code ===
+                "MARKED"
+            ) {
+
+                livenessDetected = false;
+
+                await resetLiveness();
+
+                livenessStatus.textContent =
+                    "Attendance marked. Please blink for the next person.";
+
+            }
+
+        } else {
+
+            result.innerHTML =
+                "<strong>Unknown face</strong>";
+
+            recognitionStatus.textContent =
+                data.message ||
+                "Face not recognized.";
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Recognition error:",
+            error
+        );
+
+        recognitionStatus.textContent =
+            "Recognition request failed.";
+
+    } finally {
+
+        recognitionInProgress = false;
+
+    }
+
+}
+
+
+// =========================================================
+// RECOGNITION LOOP
+// =========================================================
+
+function startRecognition() {
+
+    setInterval(
+        recognize,
+        1200
+    );
+
+}
+
+
+// =========================================================
+// SESSION CHECK
+// =========================================================
+
+async function checkSession() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/attendance/session"
+            );
+
+        const data =
+            await response.json();
+
+        if (data.active) {
+
+            sessionActive = true;
+
+            sessionStatus.textContent =
+                "🟢 Attendance session is active.";
+
+            if (!stream) {
+
+                await startCamera();
+
+            }
+
+        } else {
+
+            sessionActive = false;
+
+            sessionStatus.textContent =
+                "🔴 Attendance session is not active.";
+
+            stopCamera();
+
+            livenessStatus.textContent =
+                "Start an attendance session from the dashboard.";
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Session check error:",
+            error
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// INITIALIZATION
+// =========================================================
+
+checkSession();
+
+setInterval(
+    checkSession,
+    5000
+);
+
+setInterval(
+    checkLiveness,
+    800
+);
+
+</script>
+
+</body>
+</html>

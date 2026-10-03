@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Register Student | FaceAttend AI</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+
+    .register-page {
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .register-card {
+        background: white;
+        border-radius: 18px;
+        padding: 30px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+    }
+
+    .page-header p {
+        color: #6b7280;
+        margin-top: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+    }
+
+    .form-group input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+
+    .button-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        border: none;
+        border-radius: 8px;
+        padding: 12px 18px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #111827;
+    }
+
+    .btn-danger {
+        background: #dc2626;
+        color: white;
+    }
+
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .camera-section {
+        display: none;
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .camera-section.active {
+        display: block;
+    }
+
+    .camera-container {
+        position: relative;
+        width: 100%;
+        max-width: 640px;
+        margin: 20px auto;
+        background: #111827;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    #camera {
+        width: 100%;
+        display: block;
+    }
+
+    .progress-container {
+        margin-top: 20px;
+    }
+
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 12px;
+        background: #e5e7eb;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: #2563eb;
+        transition: width 0.2s ease;
+    }
+
+    .status-box {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 10px;
+        background: #f3f4f6;
+        color: #374151;
+        text-align: center;
+    }
+
+    .success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .error {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .info {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .capture-controls {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .instructions {
+        margin-top: 15px;
+        padding: 15px;
+        background: #f9fafb;
+        border-radius: 10px;
+        color: #4b5563;
+        line-height: 1.6;
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<div class="register-page">
+
+<div class="register-card">
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <div class="page-header">
+
+        <h1>Register Student</h1>
+
+        <p>
+            Enter the student's details and capture their face.
+        </p>
+
+    </div>
+
+
+    <!-- ==========================================
+         STUDENT FORM
+    =========================================== -->
+
+    <form id="registerForm">
+
+        <div class="form-group">
+
+            <label for="student_id">
+                Student ID
+            </label>
+
+            <input
+                type="text"
+                id="student_id"
+                name="student_id"
+                placeholder="Example: 106"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="name">
+                Student Name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Example: Rahul Kumar"
+                required
+            >
+
+        </div>
+
+
+        <div class="button-row">
+
+            <button
+                type="submit"
+                id="registerButton"
+                class="btn btn-primary">
+
+                Register & Capture Face
+
+            </button>
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="btn btn-secondary">
+
+                Dashboard
+
+            </a>
+
+        </div>
+
+    </form>
+
+
+    <!-- ==========================================
+         CAMERA SECTION
+    =========================================== -->
+
+    <div
+        id="cameraSection"
+        class="camera-section">
+
+        <h2>Face Registration</h2>
+
+        <p>
+            Keep your face inside the camera and slowly move
+            your head left, right, up and down.
+        </p>
+
+
+        <div class="camera-container">
+
+            <video
+                id="camera"
+                autoplay
+                playsinline>
+            </video>
+
+            <canvas
+                id="canvas"
+                style="display:none;">
+            </canvas>
+
+        </div>
+
+
+        <!-- ======================================
+             PROGRESS
+        ======================================= -->
+
+        <div class="progress-container">
+
+            <div class="progress-text">
+
+                <span>
+                    Face Samples
+                </span>
+
+                <span id="progressText">
+                    0 / 30
+                </span>
+
+            </div>
+
+            <div class="progress-bar">
+
+                <div
+                    id="progressFill"
+                    class="progress-fill">
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================================
+             STATUS
+        ======================================= -->
+
+        <div
+            id="statusBox"
+            class="status-box info">
+
+            Starting camera...
+
+        </div>
+
+
+        <!-- ======================================
+             CONTROLS
+        ======================================= -->
+
+        <div class="capture-controls">
+
+            <button
+                type="button"
+                id="stopButton"
+                class="btn btn-danger">
+
+                Stop Camera
+
+            </button>
+
+        </div>
+
+
+        <!-- ======================================
+             INSTRUCTIONS
+        ======================================= -->
+
+        <div class="instructions">
+
+            <strong>For better recognition:</strong>
+
+            <ul>
+
+                <li>Keep your face clearly visible.</li>
+
+                <li>Use good lighting.</li>
+
+                <li>Remove anything covering your face.</li>
+
+                <li>Slowly change your head angle.</li>
+
+                <li>Look straight, then slightly left and right.</li>
+
+                <li>Do not move too quickly.</li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+/* =====================================================
+   CONFIGURATION
+===================================================== */
+
+const TOTAL_SAMPLES = 30;
+
+/*
+ * Time between successful captures.
+ *
+ * We deliberately use a slower delay than before so
+ * InsightFace has enough time to process each image.
+ */
+const CAPTURE_DELAY = 700;
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let stream = null;
+
+let captureTimer = null;
+
+let sampleCount = 0;
+
+let capturing = false;
+
+let processingSample = false;
+
+
+/* =====================================================
+   DOM ELEMENTS
+===================================================== */
+
+const form = document.getElementById(
+    "registerForm"
+);
+
+const registerButton = document.getElementById(
+    "registerButton"
+);
+
+const cameraSection = document.getElementById(
+    "cameraSection"
+);
+
+const camera = document.getElementById(
+    "camera"
+);
+
+const canvas = document.getElementById(
+    "canvas"
+);
+
+const statusBox = document.getElementById(
+    "statusBox"
+);
+
+const progressText = document.getElementById(
+    "progressText"
+);
+
+const progressFill = document.getElementById(
+    "progressFill"
+);
+
+const stopButton = document.getElementById(
+    "stopButton"
+);
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function setStatus(message, type = "info") {
+
+    statusBox.textContent = message;
+
+    statusBox.className =
+        "status-box " + type;
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+function updateProgress() {
+
+    progressText.textContent =
+        sampleCount + " / " + TOTAL_SAMPLES;
+
+    const percentage =
+        (sampleCount / TOTAL_SAMPLES) * 100;
+
+    progressFill.style.width =
+        percentage + "%";
+}
+
+
+/* =====================================================
+   START CAMERA
+===================================================== */
+
+async function startCamera() {
+
+    try {
+
+        if (
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ) {
+
+            throw new Error(
+                "Camera API is not available."
+            );
+
+        }
+
+
+        stream =
+            await navigator.mediaDevices.getUserMedia({
+
+                video: {
+
+                    width: {
+                        ideal: 640
+                    },
+
+                    height: {
+                        ideal: 480
+                    },
+
+                    facingMode: "user"
+
+                },
+
+                audio: false
+
+            });
+
+
+        camera.srcObject = stream;
+
+        await camera.play();
+
+
+        setStatus(
+            "Camera started. Preparing face capture...",
+            "info"
+        );
+
+
+        capturing = true;
+
+        processingSample = false;
+
+
+        /*
+         * Start the first capture after the camera
+         * has had enough time to stabilize.
+         */
+        setTimeout(
+            captureSample,
+            1000
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Camera error:",
+            error
+        );
+
+        capturing = false;
+
+        setStatus(
+            "Could not access camera. Please allow camera permission.",
+            "error"
+        );
+
+        registerButton.disabled = false;
+
+        registerButton.textContent =
+            "Register & Capture Face";
+
+    }
+
+}
+
+
+/* =====================================================
+   STOP CAMERA
+===================================================== */
+
+function stopCamera() {
+
+    capturing = false;
+
+    processingSample = false;
+
+
+    if (captureTimer) {
+
+        clearTimeout(
+            captureTimer
+        );
+
+        captureTimer = null;
+
+    }
+
+
+    if (stream) {
+
+        stream.getTracks().forEach(
+            track => track.stop()
+        );
+
+        stream = null;
+
+    }
+
+
+    camera.srcObject = null;
+
+}
+
+
+/* =====================================================
+   SCHEDULE NEXT SAMPLE
+===================================================== */
+
+function scheduleNextCapture() {
+
+    if (!capturing) {
+        return;
+    }
+
+    if (sampleCount >= TOTAL_SAMPLES) {
+        finishRegistration();
+        return;
+    }
+
+
+    captureTimer = setTimeout(
+        captureSample,
+        CAPTURE_DELAY
+    );
+
+}
+
+
+/* =====================================================
+   CAPTURE SAMPLE
+===================================================== */
+
+async function captureSample() {
+
+    captureTimer = null;
+
+
+    if (!capturing) {
+        return;
+    }
+
+
+    /*
+     * Prevent multiple requests from being sent
+     * to Flask at the same time.
+     */
+    if (processingSample) {
+        return;
+    }
+
+
+    if (
+        camera.videoWidth === 0 ||
+        camera.videoHeight === 0
+    ) {
+
+        scheduleNextCapture();
+
+        return;
+
+    }
+
+
+    if (sampleCount >= TOTAL_SAMPLES) {
+
+        finishRegistration();
+
+        return;
+
+    }
+
+
+    processingSample = true;
+
+
+    /* ---------------------------------------------
+       Prepare canvas
+    --------------------------------------------- */
+
+    canvas.width =
+        camera.videoWidth;
+
+    canvas.height =
+        camera.videoHeight;
+
+
+    const context =
+        canvas.getContext("2d");
+
+
+    context.drawImage(
+        camera,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /* ---------------------------------------------
+       Convert image to base64
+    --------------------------------------------- */
+
+    const image =
+        canvas.toDataURL(
+            "image/jpeg",
+            0.85
+        );
+
+
+    try {
+
+        setStatus(
+            "Processing face sample " +
+            (sampleCount + 1) +
+            " of " +
+            TOTAL_SAMPLES +
+            "...",
+            "info"
+        );
+
+
+        /* -----------------------------------------
+           Send image to Flask
+        ----------------------------------------- */
+
+        const response =
+            await fetch(
+                "/api/register-face",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        student_id:
+                            document.getElementById(
+                                "student_id"
+                            ).value.trim(),
+
+                        name:
+                            document.getElementById(
+                                "name"
+                            ).value.trim(),
+
+                        image: image
+
+                    })
+                }
+            );
+
+
+        /* -----------------------------------------
+           Check HTTP response
+        ----------------------------------------- */
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Server returned HTTP " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        /* -----------------------------------------
+           Successful sample
+        ----------------------------------------- */
+
+        if (data.success) {
+
+            sampleCount++;
+
+            updateProgress();
+
+
+            setStatus(
+                "Face sample " +
+                sampleCount +
+                " captured successfully.",
+                "info"
+            );
+
+
+            if (
+                sampleCount >=
+                TOTAL_SAMPLES
+            ) {
+
+                finishRegistration();
+
+                return;
+
+            }
+
+
+            /*
+             * Only schedule the next request AFTER
+             * the current request has completely finished.
+             */
+            processingSample = false;
+
+            scheduleNextCapture();
+
+        }
+
+
+        /* -----------------------------------------
+           Face not detected / server rejected image
+        ----------------------------------------- */
+
+        else {
+
+            processingSample = false;
+
+            setStatus(
+                data.message ||
+                "Face not detected. Adjust your position.",
+                "error"
+            );
+
+
+            /*
+             * Do not increase sampleCount.
+             * Try again with another frame.
+             */
+            scheduleNextCapture();
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Capture error:",
+            error
+        );
+
+
+        processingSample = false;
+
+
+        setStatus(
+            "Error communicating with server. Retrying...",
+            "error"
+        );
+
+
+        /*
+         * Don't lose the registration.
+         * Try the next frame without increasing
+         * the sample count.
+         */
+        scheduleNextCapture();
+
+    }
+
+}
+
+
+/* =====================================================
+   FINISH REGISTRATION
+===================================================== */
+
+function finishRegistration() {
+
+    if (sampleCount < TOTAL_SAMPLES) {
+        return;
+    }
+
+
+    capturing = false;
+
+    processingSample = false;
+
+
+    if (captureTimer) {
+
+        clearTimeout(
+            captureTimer
+        );
+
+        captureTimer = null;
+
+    }
+
+
+    stopCamera();
+
+
+    updateProgress();
+
+
+    setStatus(
+        "Registration completed successfully! 30 face samples saved.",
+        "success"
+    );
+
+
+    registerButton.disabled = false;
+
+    registerButton.textContent =
+        "Register & Capture Face";
+
+
+    setTimeout(
+        function () {
+
+            window.location.href =
+                "/students";
+
+        },
+        2000
+    );
+
+}
+
+
+/* =====================================================
+   REGISTER STUDENT
+===================================================== */
+
+form.addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+
+        const studentId =
+            document.getElementById(
+                "student_id"
+            ).value.trim();
+
+
+        const name =
+            document.getElementById(
+                "name"
+            ).value.trim();
+
+
+        if (!studentId || !name) {
+
+            alert(
+                "Please enter Student ID and Name."
+            );
+
+            return;
+
+        }
+
+
+        registerButton.disabled = true;
+
+        registerButton.textContent =
+            "Creating Student...";
+
+
+        try {
+
+            const formData =
+                new FormData();
+
+
+            formData.append(
+                "student_id",
+                studentId
+            );
+
+
+            formData.append(
+                "name",
+                name
+            );
+
+
+            /*
+             * Existing Flask registration endpoint.
+             */
+            const response =
+                await fetch(
+                    "/register",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            /*
+             * Check server response before trying
+             * to parse JSON.
+             */
+            if (!response.ok) {
+
+                throw new Error(
+                    "Registration request failed: HTTP " +
+                    response.status
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (!data.success) {
+
+                alert(
+                    data.message ||
+                    "Registration failed."
+                );
+
+
+                registerButton.disabled =
+                    false;
+
+
+                registerButton.textContent =
+                    "Register & Capture Face";
+
+
+                return;
+
+            }
+
+
+            /* -------------------------------------
+               Hide student form
+            ------------------------------------- */
+
+            form.style.display =
+                "none";
+
+
+            /* -------------------------------------
+               Show camera section
+            ------------------------------------- */
+
+            cameraSection.classList.add(
+                "active"
+            );
+
+
+            sampleCount = 0;
+
+            processingSample = false;
+
+            updateProgress();
+
+
+            await startCamera();
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Registration error:",
+                error
+            );
+
+
+            alert(
+                "Something went wrong during registration."
+            );
+
+
+            registerButton.disabled =
+                false;
+
+
+            registerButton.textContent =
+                "Register & Capture Face";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   STOP BUTTON
+===================================================== */
+
+stopButton.addEventListener(
+    "click",
+    function () {
+
+        stopCamera();
+
+
+        setStatus(
+            "Face capture stopped.",
+            "error"
+        );
+
+    }
+);
+
+
+/* =====================================================
+   CLEANUP WHEN LEAVING PAGE
+===================================================== */
+
+window.addEventListener(
+    "beforeunload",
+    function () {
+
+        stopCamera();
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
