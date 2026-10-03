@@ -1,26 +1,20 @@
+import os
 import psycopg2
 
 
 # ============================================================
-# DATABASE CONFIGURATION
-# ============================================================
-
-DB_CONFIG = {
-    "host": "localhost",
-    "port": 5432,
-    "database": "facial-attendance",
-    "user": "postgres",
-    "password": "Dhruv@123456"
-}
-
-
-# ============================================================
-# GET DATABASE CONNECTION
+# DATABASE CONNECTION
 # ============================================================
 
 def get_connection():
     """
     Create and return a PostgreSQL database connection.
+
+    Local:
+        Uses individual DB environment variables.
+
+    Render:
+        Uses DATABASE_URL.
 
     Returns:
         psycopg2 connection object if successful.
@@ -28,13 +22,40 @@ def get_connection():
     """
 
     try:
-        connection = psycopg2.connect(
-            host=DB_CONFIG["host"],
-            port=DB_CONFIG["port"],
-            database=DB_CONFIG["database"],
-            user=DB_CONFIG["user"],
-            password=DB_CONFIG["password"]
-        )
+
+        database_url = os.getenv("DATABASE_URL")
+
+        # ====================================================
+        # RENDER / PRODUCTION
+        # ====================================================
+
+        if database_url:
+
+            connection = psycopg2.connect(
+                database_url
+            )
+
+        # ====================================================
+        # LOCAL DEVELOPMENT
+        # ====================================================
+
+        else:
+
+            connection = psycopg2.connect(
+                host=os.getenv("DB_HOST", "localhost"),
+                port=os.getenv("DB_PORT", "5432"),
+                database=os.getenv(
+                    "DB_NAME",
+                    "facial-attendance"
+                ),
+                user=os.getenv(
+                    "DB_USER",
+                    "postgres"
+                ),
+                password=os.getenv(
+                    "DB_PASSWORD"
+                )
+            )
 
         return connection
 
