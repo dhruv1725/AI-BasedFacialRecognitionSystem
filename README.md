@@ -1,129 +1,106 @@
 # FaceAttend AI — AI-Based Facial Recognition Attendance System
 
-FaceAttend AI is an AI-powered facial recognition attendance system designed to automate student attendance using **face recognition, liveness detection, PostgreSQL, and a web-based dashboard**.
+FaceAttend AI is an AI-powered facial recognition attendance system built with Python, Flask, InsightFace, OpenCV, and PostgreSQL.
 
-The system captures and registers student faces, generates facial embeddings using InsightFace, recognizes registered students through a camera, and automatically records attendance in a PostgreSQL database.
+The system allows students to register their faces, recognize registered students through a camera, automatically mark attendance, and view attendance analytics through a web interface.
 
 ---
 
 ## 🚀 Features
 
-### 🤖 AI Face Recognition
+### 🤖 AI Facial Recognition
 
-* Uses **InsightFace** for face detection and facial embeddings.
-* Compares live face embeddings with registered face embeddings.
-* Uses cosine similarity to determine identity.
-* Configurable recognition threshold.
-* Displays recognized student information in real time.
+* Uses InsightFace for face detection and recognition.
+* Generates facial embeddings for registered students.
+* Uses cosine similarity to compare faces.
+* Supports multiple face samples for better recognition.
 
 ### 🛡️ Liveness Detection
 
-* Includes a liveness-detection module to help distinguish a real person from a static image.
-* Helps improve the reliability of automated attendance.
+* Helps distinguish a live person from a static image.
+* Adds an additional security layer to the attendance process.
 
 ### 📸 Face Registration
 
-* Register students using a browser camera.
+* Register students using a webcam.
 * Captures multiple face samples.
-* Generates and stores facial embeddings.
-* Supports different face angles and expressions to improve recognition.
+* Generates and stores face embeddings.
+* Supports different face angles and samples.
 
-### 📝 Automated Attendance
+### ✅ Automated Attendance
 
-* Automatically marks a recognized student as **Present**.
+* Automatically marks recognized students as Present.
 * Prevents duplicate attendance for the same student on the same day.
-* Records:
-
-  * Student ID
-  * Attendance date
-  * Attendance time
-  * Attendance status
+* Stores attendance date and time in PostgreSQL.
 
 ### 📊 Attendance Analytics
 
-* Dashboard with attendance statistics.
 * Attendance percentage calculation.
-* Attendance period can be configured using a start date.
+* Attendance history.
+* Attendance statistics from a configurable attendance start date.
 * Student-specific attendance information.
-* Daily and historical attendance views.
 
 ### 👨‍🎓 Student Management
 
-* View all registered students.
+* View registered students.
 * View individual student details.
-* View student-specific attendance history.
+* View student attendance records.
 
 ### 🗄️ PostgreSQL Database
 
-The system uses PostgreSQL for storing:
+Stores:
 
 * Student information
 * Attendance records
-* Attendance configuration
+* Attendance settings
 
 ### 🌐 Web Interface
 
-Built with Flask and HTML/CSS.
+Built using:
 
-Main pages include:
-
-* Dashboard
-* Register Student
-* Face Recognition
-* Students
-* Today's Attendance
-* All Attendance
-* Student Details
+* Flask
+* HTML
+* CSS
+* JavaScript
 
 ---
 
-## 🏗️ Technology Stack
+## 🛠️ Technology Stack
 
-| Technology   | Purpose                            |
-| ------------ | ---------------------------------- |
-| Python       | Core programming language          |
-| Flask        | Web application framework          |
-| InsightFace  | Face recognition and embeddings    |
-| ONNX Runtime | AI model inference                 |
-| OpenCV       | Image and camera processing        |
-| NumPy        | Numerical and embedding operations |
-| PostgreSQL   | Database                           |
-| psycopg2     | PostgreSQL connection              |
-| HTML5        | Web interface                      |
-| CSS3         | UI styling                         |
-| JavaScript   | Browser camera and frontend logic  |
-| Gunicorn     | Production WSGI server             |
+| Technology   | Purpose                        |
+| ------------ | ------------------------------ |
+| Python       | Backend development            |
+| Flask        | Web application                |
+| InsightFace  | Face recognition               |
+| ONNX Runtime | AI model execution             |
+| OpenCV       | Camera and image processing    |
+| NumPy        | Numerical operations           |
+| PostgreSQL   | Database                       |
+| psycopg2     | PostgreSQL connection          |
+| HTML5        | Web pages                      |
+| CSS3         | User interface                 |
+| JavaScript   | Browser camera and interaction |
+| Gunicorn     | Production server              |
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```text
 AI-BasedFacialRecognitionSystem/
 │
 ├── app/
 │   ├── analytics/
-│   │   └── analytics.py
-│   │
 │   ├── camera/
-│   │   └── camera.py
-│   │
 │   ├── database/
-│   │   ├── db.py
-│   │   └── schema.py
-│   │
 │   ├── liveness/
-│   │   └── liveness.py
-│   │
 │   ├── recognition/
 │   │   ├── face/
 │   │   │   ├── embedding.py
 │   │   │   └── register.py
 │   │   └── recognize.py
-│   │
 │   ├── training/
 │   │   └── train.py
-│   │
 │   └── main.py
 │
 ├── attendance/
@@ -137,7 +114,6 @@ AI-BasedFacialRecognitionSystem/
 │
 ├── web/
 │   ├── app.py
-│   │
 │   ├── static/
 │   │   └── css/
 │   │       └── style.css
@@ -160,93 +136,71 @@ AI-BasedFacialRecognitionSystem/
 
 ---
 
-## ⚙️ How It Works
+## 🔄 How the System Works
 
 ```text
-                 ┌─────────────────────┐
-                 │     Student         │
-                 └──────────┬──────────┘
-                            │
-                            ▼
-                 ┌─────────────────────┐
-                 │ Browser Camera      │
-                 └──────────┬──────────┘
-                            │
-                            ▼
-                 ┌─────────────────────┐
-                 │ Face Detection      │
-                 │   InsightFace       │
-                 └──────────┬──────────┘
-                            │
-                            ▼
-                 ┌─────────────────────┐
-                 │ Liveness Detection  │
-                 └──────────┬──────────┘
-                            │
-                            ▼
-                 ┌─────────────────────┐
-                 │ Face Embedding      │
-                 └──────────┬──────────┘
-                            │
-                            ▼
-                 ┌─────────────────────┐
-                 │ Compare Embeddings  │
-                 │ Cosine Similarity   │
-                 └──────────┬──────────┘
-                            │
-                     Match Found?
-                       /        \
-                     Yes         No
-                      │           │
-                      ▼           ▼
-              ┌────────────┐   Unknown
-              │ Attendance │
-              │   Present  │
-              └─────┬──────┘
-                    │
-                    ▼
-              ┌────────────┐
-              │ PostgreSQL │
-              └────────────┘
+Student Registration
+        ↓
+Capture Face Samples
+        ↓
+Generate Face Embeddings
+        ↓
+Store Student + Embeddings
+        ↓
+Open Recognition Page
+        ↓
+Detect Face
+        ↓
+Generate Current Face Embedding
+        ↓
+Compare With Registered Embeddings
+        ↓
+Recognize Student
+        ↓
+Check Attendance
+        ↓
+Mark Present
+        ↓
+Store Attendance in PostgreSQL
+        ↓
+Display Analytics
 ```
 
 ---
 
 ## 🧠 Face Recognition Process
 
-During student registration:
+FaceAttend AI uses InsightFace to generate numerical representations called **face embeddings**.
+
+During registration:
 
 ```text
-Student
-   ↓
 Camera
    ↓
 Face Detection
    ↓
-Multiple Face Samples
+Face Embedding
    ↓
-Face Embeddings
-   ↓
-Stored Embeddings
+Save Embedding
 ```
 
-During attendance:
+During recognition:
 
 ```text
-Live Camera
-     ↓
+Camera
+   ↓
 Face Detection
-     ↓
-Face Embedding
-     ↓
-Compare with Registered Embeddings
-     ↓
-Similarity Score
-     ↓
-Recognized Student
-     ↓
-Attendance Database
+   ↓
+Generate Embedding
+   ↓
+Compare With Registered Embeddings
+   ↓
+Calculate Similarity
+   ↓
+Recognized / Unknown
 ```
+
+Cosine similarity is used to compare the current face embedding with registered face embeddings.
 
 ---
 
@@ -254,7 +208,7 @@ Attendance Database
 
 The application uses PostgreSQL.
 
-### Students
+### Students Table
 
 Stores registered student information.
 
@@ -266,9 +220,9 @@ students
 └── created_at
 ```
 
-### Attendance
+### Attendance Table
 
-Stores attendance records.
+Stores daily attendance.
 
 ```text
 attendance
@@ -283,7 +237,7 @@ The database prevents duplicate attendance for the same student on the same date
 
 ### Attendance Settings
 
-Stores the configured attendance start date.
+Stores the attendance calculation start date.
 
 ```text
 attendance_settings
@@ -293,33 +247,32 @@ attendance_settings
 
 ---
 
-## 💻 Installation
+# ⚙️ Installation
 
-### 1. Clone the repository
+## 1. Clone the Repository
 
 ```bash
 git clone https://github.com/dhruv1725/AI-BasedFacialRecognitionSystem.git
-```
-
-```bash
 cd AI-BasedFacialRecognitionSystem
 ```
 
-### 2. Create a virtual environment
+---
+
+## 2. Create Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-### 3. Activate the virtual environment
-
-#### Windows PowerShell
+### Windows
 
 ```powershell
-.\venv\Scripts\Activate.ps1
+venv\Scripts\activate
 ```
 
-### 4. Install dependencies
+---
+
+## 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -327,190 +280,21 @@ pip install -r requirements.txt
 
 ---
 
-## 🐘 PostgreSQL Setup
+# 🗄️ PostgreSQL Configuration
 
-Install PostgreSQL and create a database:
+The application uses environment variables for database credentials.
 
-```text
-facial-attendance
-```
-
-The application uses environment variables for database configuration.
-
-### Local environment variables
+Set:
 
 ```text
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=facial-attendance
-DB_USER=postgres
-DB_PASSWORD=your_password
+DB_HOST
+DB_PORT
+DB_NAME
+DB_USER
+DB_PASSWORD
 ```
 
-For production environments, the application can use:
+Example for PowerShell:
 
-```text
-DATABASE_URL
+```powershel
 ```
-
-Do **not** commit database passwords or other secrets to GitHub.
-
----
-
-## ▶️ Running the Application
-
-From the project root:
-
-```powershell
-python web\app.py
-```
-
-Then open:
-
-```text
-http://127.0.0.1:5000
-```
-
----
-
-## 📸 Register a Student
-
-1. Open the web application.
-2. Go to **Register Student**.
-3. Enter:
-
-   * Student ID
-   * Student Name
-4. Allow camera access.
-5. The system captures multiple face samples.
-6. Face embeddings are generated.
-7. The student becomes available for recognition.
-
----
-
-## 👤 Mark Attendance
-
-1. Open **Recognition**.
-2. Allow camera access.
-3. Look toward the camera.
-4. The system detects the face.
-5. InsightFace generates the live embedding.
-6. The embedding is compared with registered embeddings.
-7. If a valid match is found, attendance is recorded.
-8. Duplicate attendance for the same day is prevented.
-
----
-
-## 📊 Attendance Analytics
-
-The dashboard provides information such as:
-
-* Total students
-* Present students
-* Attendance percentage
-* Attendance period
-* Student attendance history
-* Daily attendance records
-
-The attendance calculation uses the configured attendance start date.
-
----
-
-## 🔐 Security Notes
-
-This project processes biometric information, so deployment should be handled carefully.
-
-Do not commit:
-
-```text
-.env
-database passwords
-face images
-facial embeddings
-private credentials
-```
-
-Use environment variables for sensitive configuration.
-
----
-
-## 🚀 Deployment
-
-The application can be deployed using a Python-compatible hosting platform.
-
-Production server:
-
-```bash
-gunicorn web.app:app
-```
-
-Build command:
-
-```bash
-pip install -r requirements.txt
-```
-
-For production deployment, database credentials should be supplied through environment variables.
-
-Face embeddings stored on a server filesystem also require persistent storage if registrations need to survive server restarts or redeployments.
-
----
-
-## 🧪 Testing
-
-The project includes testing code for liveness detection.
-
-Run:
-
-```powershell
-python test\test_liveness.py
-```
-
-Database information can be checked using:
-
-```powershell
-python check_db.py
-```
-
-Attendance records can be inspected using:
-
-```powershell
-python check_attendance.py
-```
-
----
-
-## 🔮 Future Improvements
-
-Possible future improvements include:
-
-* Cloud/object storage for face embeddings
-* Improved anti-spoofing
-* Multi-camera support
-* Role-based authentication
-* Admin panel
-* Email attendance reports
-* CSV/PDF attendance export
-* Advanced attendance analytics
-* Notification system
-* Mobile-friendly interface
-* Recognition performance optimization
-* Docker deployment
-* Cloud-based AI inference
-
----
-
-## 👨‍💻 Author
-
-**Dhruv Kumar**
-
-GitHub:
-https://github.com/dhruv1725
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-
-See the `LICENSE` file for details.
